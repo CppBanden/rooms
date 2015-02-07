@@ -10,11 +10,11 @@ void ofApp::setup(){
 
 	// load graphics
 	background.loadImage("sprites/room1_bg.png");
-	background.getPixelsRef().resize(1280,320,OF_INTERPOLATE_NEAREST_NEIGHBOR);  
+	background.getPixelsRef().resize(backgroundWidth,backgroundHeight,OF_INTERPOLATE_NEAREST_NEIGHBOR);  
 	background.update();
 
 	player.loadImage("sprites/person1_frm1.png");
-	player.getPixelsRef().resize(80,80,OF_INTERPOLATE_NEAREST_NEIGHBOR);  
+	player.getPixelsRef().resize(playerWidth,playerHeight,OF_INTERPOLATE_NEAREST_NEIGHBOR);  
 	player.update();
 
 	ofSetFrameRate(60); // if vertical sync is off, we can go a bit fast... this caps the framerate at 60fps.
@@ -33,8 +33,8 @@ void ofApp::draw(){
 	ofSetColor(255);
 
 	// draw image
-	background.draw(1, 170);
-	player.draw(1, 170);
+	background.draw(marginTop, marginLeft);
+	player.draw(marginLeft, marginTop + backgroundHeight);
 	ofSetHexColor(0x000000);
 }
 
