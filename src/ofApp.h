@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "entities.h"
 
 class ofApp : public ofBaseApp{
 
@@ -35,6 +36,6 @@ class ofApp : public ofBaseApp{
 		float	positionPrikX;
 		float	positionPrikY;
 
-		ofImage player;
+		Player * player;
 		ofImage background;
 };

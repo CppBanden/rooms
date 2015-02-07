@@ -37,7 +37,7 @@ enum PlayerState
 
 struct Player
 {
-	static const int spriteWalkCount = 6;
+	static const int spriteWalkCount = 12;
 	int spriteWalkIndex = 0;
 
 	ofImage spriteWalk[spriteWalkCount];// ofImage-array of spriteWalkCount elements
@@ -50,9 +50,12 @@ struct Player
 
 	ofVec2f pos;
 	ofVec2f vel;
+	float facing;
 
-	void Init();
+	void Init(int spriteWidth, int spriteHeight);
+	void SetFacing(float facing);
 	void Update();
+	void Draw(int offsetX, int offsetY);
 };
 
 #endif//__ENTITIES_H__

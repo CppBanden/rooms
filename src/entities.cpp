@@ -1,20 +1,51 @@
 #include "entities.h"
+#include "ofApp.h"
 
-void Player::Init()
+void Player::Init(int spriteWidth, int spriteHeight)
 {
 	// load sprites
 	char filename[256];
+	for (int i = 0; i != spriteWalkCount; i++)
+	{
+		sprintf(filename, "sprites/person_walk%d.png", i >> 1);
+		spriteWalk[i].loadImage(filename);
+		spriteWalk[i].getPixelsRef().resize(spriteWidth, spriteHeight, OF_INTERPOLATE_NEAREST_NEIGHBOR);
+		spriteWalk[i].update();
+	}
+
+	spriteFaceBack.loadImage("sprites/person_back.png");
+	spriteFaceBack.getPixelsRef().resize(spriteWidth, spriteHeight, OF_INTERPOLATE_NEAREST_NEIGHBOR);
+	spriteFaceBack.update();
+
+	spriteFaceFront.loadImage("sprites/person_front.png");
+	spriteFaceFront.getPixelsRef().resize(spriteWidth, spriteHeight, OF_INTERPOLATE_NEAREST_NEIGHBOR);
+	spriteFaceFront.update();
+
+	// set initial position
+	pos = ofVec2f(0.0f, 0.0f);
+	vel = ofVec2f(0.0f, 0.0f);
+	facing = 1.0f;
+
+	// set initial room, state, action
+	room = nullptr;
+	state = PlayerState_Walk;
+	action = nullptr;
+}
+
+void Player::SetFacing(float facing)
+{
+	if (this->facing == facing)
+		return;
+
+	this->facing = facing;
 
 	for (int i = 0; i != spriteWalkCount; i++)
 	{
-		sprintf(filename, "sprites/person_walk%d.png", i);
-		spriteWalk[i].loadImage(filename);
+		spriteWalk[i].mirror(false, true);
 	}
 
-	// set initial position
-		
-	// set initial room
-
+	spriteFaceBack.mirror(false, true);
+	spriteFaceFront.mirror(false, true);
 }
 
 void Player::Update()
@@ -39,13 +70,28 @@ void Player::Update()
 			}
 			else
 			{
-				if (pressedL)
-					vel.x = -1.0f;
-				if (pressedR)
-					vel.x = 1.0f;
+				if (pressedL || pressedR)
+				{
+					SetFacing(pressedL ? -1.0f : 1.0f);
+					vel.x = facing * (ofApp::scalingFactor * 0.25f);
+				}
+				else
+				{
+					vel.x = 0.0f;
+				}
 
 				pos.x += vel.x;
 				//TODO: test if we pass through an exit
+
+				if (vel.x == 0.0f)
+				{
+					spriteWalkIndex = 0;
+				}
+				else
+				{
+					spriteWalkIndex++;
+					spriteWalkIndex %= spriteWalkCount;
+				}
 			}
 		} break;
 
@@ -54,8 +100,7 @@ void Player::Update()
 			if (pressedA)
 			{
 				//TODO: find action
-				//action = room->FindAction(this);
-				action = nullptr;
+				action = nullptr;//room->FindAction(this);
 				if (action != nullptr)
 				{
 					state = PlayerState_PerformAction;
@@ -73,11 +118,30 @@ void Player::Update()
 			{
 				action = action->Update(this);
 			}
-
-			if (action == nullptr);
+			if (action == nullptr)
 			{
 				state = PlayerState_FindAction;
 			}
 		} break;
+	}
+}
+
+void Player::Draw(int offsetX, int offsetY)
+{
+	float x = offsetX + pos.x;
+	float y = offsetY + pos.y;
+
+	ofImage * image = nullptr;
+
+	switch (state)
+	{
+	case PlayerState_Walk: image = &spriteWalk[spriteWalkIndex]; break;
+	case PlayerState_FindAction: image = &spriteFaceBack; break;
+	case PlayerState_PerformAction: image = &spriteFaceBack; break;
+	}
+
+	if (image != nullptr)
+	{
+		image->draw(x, y);
 	}
 }

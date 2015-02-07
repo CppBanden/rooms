@@ -1,4 +1,5 @@
 #include "ofApp.h"
+#include "entities.h"
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -13,11 +14,10 @@ void ofApp::setup(){
 	background.getPixelsRef().resize(backgroundWidth,backgroundHeight,OF_INTERPOLATE_NEAREST_NEIGHBOR);  
 	background.update();
 
-	player.loadImage("sprites/person1_frm1.png");
-	player.getPixelsRef().resize(playerWidth,playerHeight,OF_INTERPOLATE_NEAREST_NEIGHBOR);  
-	player.update();
+	player = new Player();
+	player->Init(playerWidth, playerHeight);
 
-	ofSetFrameRate(60); // if vertical sync is off, we can go a bit fast... this caps the framerate at 60fps.
+	ofSetFrameRate(15); // if vertical sync is off, we can go a bit fast... this caps the framerate at 60fps.
 }
 
 //--------------------------------------------------------------
@@ -26,15 +26,21 @@ void ofApp::update(){
 	position = position + 3.0f;
 	if ( position >= 1080.0f)
 		position = -60.0f;
+
+	player->Update();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
 	ofSetColor(255);
 
-	// draw image
+	// draw room
 	background.draw(marginTop, marginLeft);
-	player.draw(marginLeft, marginTop + backgroundHeight);
+
+	// draw player
+	player->Draw(marginLeft, marginTop + backgroundHeight - 3*scalingFactor);
+
+
 	ofSetHexColor(0x000000);
 }
 
