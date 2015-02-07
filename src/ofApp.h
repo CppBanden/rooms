@@ -3,8 +3,8 @@
 #include "ofMain.h"
 #include "entities.h"
 
-class ofApp : public ofBaseApp{
-
+class ofApp : public ofBaseApp
+{
 	public:
 		void setup();
 		void update();
@@ -20,22 +20,21 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
-		static const int scalingFactor = 8;
+		static const int scalingFactor = 7;
 		static const int viewportWidth = 1280;
 		static const int viewportHeight = 720;
 		static const int backgroundWidth = scalingFactor*128;
 		static const int backgroundHeight = scalingFactor*32;
 		static const int marginTop = (viewportHeight - backgroundHeight) / 2;
 		static const int marginLeft = (viewportWidth - backgroundWidth) / 2;
-		static const int playerWidth = scalingFactor*8;
-		static const int playerHeight = scalingFactor*8;
-
+		static const int playerWidth = scalingFactor * 8;
+		static const int playerHeight = scalingFactor * 8;
 
 		float 	counter;
 		float	position;
 		float	positionPrikX;
 		float	positionPrikY;
 
-		Player * player;
-		ofImage background;
+		Player *			player;
+		std::list<Room *>	rooms;
 };

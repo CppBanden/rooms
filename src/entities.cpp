@@ -1,7 +1,7 @@
 #include "entities.h"
 #include "ofApp.h"
 
-void Player::Init(int spriteWidth, int spriteHeight)
+void Player::Init()
 {
 	// load sprites
 	spriteWalkIndex = 0;
@@ -10,16 +10,16 @@ void Player::Init(int spriteWidth, int spriteHeight)
 	{
 		sprintf(filename, "sprites/person_walk%d.png", i >> 1);
 		spriteWalk[i].loadImage(filename);
-		spriteWalk[i].getPixelsRef().resize(spriteWidth, spriteHeight, OF_INTERPOLATE_NEAREST_NEIGHBOR);
+		spriteWalk[i].getPixelsRef().resize(ofApp::playerWidth, ofApp::playerHeight, OF_INTERPOLATE_NEAREST_NEIGHBOR);
 		spriteWalk[i].update();
 	}
 
 	spriteFaceBack.loadImage("sprites/person_back.png");
-	spriteFaceBack.getPixelsRef().resize(spriteWidth, spriteHeight, OF_INTERPOLATE_NEAREST_NEIGHBOR);
+	spriteFaceBack.getPixelsRef().resize(ofApp::playerWidth, ofApp::playerHeight, OF_INTERPOLATE_NEAREST_NEIGHBOR);
 	spriteFaceBack.update();
 
 	spriteFaceFront.loadImage("sprites/person_front.png");
-	spriteFaceFront.getPixelsRef().resize(spriteWidth, spriteHeight, OF_INTERPOLATE_NEAREST_NEIGHBOR);
+	spriteFaceFront.getPixelsRef().resize(ofApp::playerWidth, ofApp::playerHeight, OF_INTERPOLATE_NEAREST_NEIGHBOR);
 	spriteFaceFront.update();
 
 	// set initial position
@@ -71,27 +71,35 @@ void Player::Update()
 			}
 			else
 			{
-				if (pressedL || pressedR)
+				action = room->FindAction(this);
+				if (action != nullptr)
 				{
-					SetFacing(pressedL ? -1.0f : 1.0f);
-					vel.x = facing * (ofApp::scalingFactor * 0.25f);
+					action->Start(this);
+					state = PlayerState_PerformAction;
 				}
 				else
 				{
-					vel.x = 0.0f;
-				}
+					if (pressedL || pressedR)
+					{
+						SetFacing(pressedL ? -1.0f : 1.0f);
+						vel.x = facing * (ofApp::scalingFactor * 1.0f);
+					}
+					else
+					{
+						vel.x = 0.0f;
+					}
 
-				pos.x += vel.x;
-				//TODO: test if we pass through an exit
+					pos.x += vel.x;
 
-				if (vel.x == 0.0f)
-				{
-					spriteWalkIndex = 0;
-				}
-				else
-				{
-					spriteWalkIndex++;
-					spriteWalkIndex %= spriteWalkCount;
+					if (vel.x == 0.0f)
+					{
+						spriteWalkIndex = 0;
+					}
+					else
+					{
+						spriteWalkIndex++;
+						spriteWalkIndex %= spriteWalkCount;
+					}
 				}
 			}
 		} break;
@@ -100,10 +108,10 @@ void Player::Update()
 		{
 			if (pressedA)
 			{
-				//TODO: find action
-				action = NULL;//room->FindAction(this);
-				if (action != NULL)
+				action = room->FindAction(this);
+				if (action != nullptr)
 				{
+					action->Start(this);
 					state = PlayerState_PerformAction;
 				}
 			}
@@ -121,16 +129,16 @@ void Player::Update()
 			}
 			if (action == NULL)
 			{
-				state = PlayerState_FindAction;
+				state = PlayerState_Walk;
 			}
 		} break;
 	}
 }
 
-void Player::Draw(int offsetX, int offsetY)
+void Player::Draw()
 {
-	float x = offsetX + pos.x;
-	float y = offsetY + pos.y;
+	float x = room->pos.x + pos.x;
+	float y = room->pos.y + pos.y;
 
 	ofImage * image = NULL;
 
@@ -170,26 +178,39 @@ void Room::Update()
 {
 }
 
-void Room::DrawBack(int offsetX, int offsetY)
+void Room::DrawBack()
 {
 	if (!bgImage.isAllocated())
 		return;
 
-	float x = offsetX;
-	float y = offsetY;
-
-	bgImage.draw(x, y);
+	ofSetColor(255 * opacity);
+	bgImage.draw(pos.x, pos.y);
+	ofSetColor(255);
 }
 
-void Room::DrawFront(int offsetX, int offsetY)
+void Room::DrawActions()
+{
+	ofSetColor(0, 255, 0, 127);
+	for (std::list<PlayerAction *>::iterator it = actions.begin(); it != actions.end(); it++)
+	{
+		PlayerAction * action = *it;
+		float x = pos.x + action->pos.x;
+		float y = pos.y + action->pos.y;
+		float w = action->dim.x;
+		float h = action->dim.y;
+		ofDrawBox(x + w / 2, y + h / 2, 0.0f, w, h, 0.0f);
+	}
+	ofSetColor(255, 255, 255, 255);
+}
+
+void Room::DrawFront()
 {
 	if (!fgImage.isAllocated())
 		return;
 
-	float x = offsetX;
-	float y = offsetY;
-
-	fgImage.draw(x, y);
+	ofSetColor(255 * opacity);
+	fgImage.draw(pos.x, pos.y);
+	ofSetColor(255);
 }
 
 PlayerAction * Room::FindAction(Player * player)
@@ -207,10 +228,12 @@ PlayerAction * Room::FindAction(Player * player)
 		float aMinY = action->pos.y;
 		float aMaxY = action->pos.y + action->dim.y;
 
-		bool overlapX = (pMinX < aMinX && aMinX < pMaxX) || (pMinX < aMaxX && aMaxX < pMaxX);
-		bool overlapY = (pMinY < aMinY && aMinY < pMaxY) || (pMinY < aMaxY && aMaxY < pMaxY);
+		bool outsideX = (pMaxX < aMinX) || (pMinX > aMaxX);
+		bool outsideY = (pMaxY < aMinY) || (pMinY > aMaxY);
 
-		if (overlapX && overlapY && action->requiredState == player->state)
+		std::cout << "outsideX " << outsideX << " outsideY " << outsideY << std::endl;
+
+		if (!outsideX && !outsideY && action->requiredState == player->state)
 		{
 			return action;
 		}
