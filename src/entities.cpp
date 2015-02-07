@@ -4,6 +4,7 @@
 void Player::Init()
 {
 	// load sprites
+	spriteWalkIndex = 0;
 	char filename[256];
 	for (int i = 0; i != spriteWalkCount; i++)
 	{
@@ -27,9 +28,9 @@ void Player::Init()
 	facing = 1.0f;
 
 	// set initial room, state, action
-	room = nullptr;
+	room = NULL;
 	state = PlayerState_Walk;
-	action = nullptr;
+	action = NULL;
 }
 
 void Player::SetFacing(float facing)
@@ -122,11 +123,11 @@ void Player::Update()
 
 		case PlayerState_PerformAction:
 		{
-			if (action != nullptr)
+			if (action != NULL)
 			{
 				action = action->Update(this);
 			}
-			if (action == nullptr)
+			if (action == NULL)
 			{
 				state = PlayerState_Walk;
 			}
@@ -139,7 +140,7 @@ void Player::Draw()
 	float x = room->pos.x + pos.x;
 	float y = room->pos.y + pos.y;
 
-	ofImage * image = nullptr;
+	ofImage * image = NULL;
 
 	switch (state)
 	{
@@ -148,7 +149,7 @@ void Player::Draw()
 	case PlayerState_PerformAction: image = &spriteFaceBack; break;
 	}
 
-	if (image != nullptr)
+	if (image != NULL)
 	{
 		ofSetColor(255 * room->opacity);
 		image->draw(x, y);

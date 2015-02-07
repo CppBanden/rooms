@@ -45,7 +45,7 @@ struct PlayerAction
 struct Player
 {
 	static const int spriteWalkCount = 12;
-	int spriteWalkIndex = 0;
+	int spriteWalkIndex;
 
 	ofImage spriteWalk[spriteWalkCount];// ofImage-array of spriteWalkCount elements
 	ofImage spriteFaceBack;
