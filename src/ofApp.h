@@ -23,4 +23,6 @@ class ofApp : public ofBaseApp{
 		float	position;
 		float	positionPrikX;
 		float	positionPrikY;
+
+		ofImage background;
 };
