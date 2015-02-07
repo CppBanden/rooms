@@ -12,13 +12,15 @@ struct Room
 	float opacity;
 	ofImage bgImage;
 	ofImage fgImage;
+	ofVec2f pos;
 
 	std::list<PlayerAction *> actions;
 
 	void Init(const char * bgFilename, const char * fgFilename);
 	void Update();
-	void DrawBack(int offsetX, int offsetY);
-	void DrawFront(int offsetX, int offsetY);
+	void DrawBack();
+	void DrawActions();
+	void DrawFront();
 
 	PlayerAction * FindAction(Player * player);
 };
@@ -36,6 +38,7 @@ struct PlayerAction
 	ofVec2f pos;
 	ofVec2f dim;
 
+	virtual void Start(Player * player) = 0;
 	virtual PlayerAction * Update(Player * player) = 0;
 };
 
@@ -56,10 +59,10 @@ struct Player
 	ofVec2f vel;
 	float facing;
 
-	void Init(int spriteWidth, int spriteHeight);
+	void Init();
 	void SetFacing(float facing);
 	void Update();
-	void Draw(int offsetX, int offsetY);
+	void Draw();
 };
 
 struct World
