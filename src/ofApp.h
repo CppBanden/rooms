@@ -24,5 +24,6 @@ class ofApp : public ofBaseApp{
 		float	positionPrikX;
 		float	positionPrikY;
 
+		ofImage player;
 		ofImage background;
 };
