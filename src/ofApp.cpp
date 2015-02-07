@@ -5,8 +5,12 @@ void ofApp::setup(){
 	counter = 0;
 	position = -60.0f;
 	ofSetCircleResolution(50);
-	ofBackground(108, 45, 88);
+	ofBackground(0,0,0);
 	ofSetWindowTitle("the first");
+
+	// load graphics
+	background.loadImage("images/60000bees.png");
+	background.resize(128*10, 32*10);
 
 	ofSetFrameRate(60); // if vertical sync is off, we can go a bit fast... this caps the framerate at 60fps.
 }
@@ -21,26 +25,11 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-	//--------------------------- circles
-	//let's draw a circle:
-	ofSetColor(37, 126, 120);
-	ofFill();		// draw "filled shapes"
-	ofCircle(position,400,60);
+	ofSetColor(255);
 
-	// prik
-	positionPrikX = position - 60*sin(counter);
-	positionPrikY = 400;
-	ofSetColor(64, 184, 175);
-	ofFill();		// draw "prik"
-	ofCircle(positionPrikX,positionPrikY,4);
-
-	// use the bitMap type
-	// note, this can be slow on some graphics cards
-	// because it is using glDrawPixels which varies in
-	// speed from system to system.  try using ofTrueTypeFont
-	// if this bitMap type slows you down.
+	// draw image
+	background.draw(1, 32*8);
 	ofSetHexColor(0x000000);
-	ofDrawBitmapString("well, well, well, how the turntables", 75,500);
 }
 
 //--------------------------------------------------------------
