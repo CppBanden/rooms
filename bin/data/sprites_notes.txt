@@ -1,0 +1,6 @@
+player
+  8x8
+
+rooms
+  128x32
+
