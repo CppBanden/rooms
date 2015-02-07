@@ -35,10 +35,10 @@ void ofApp::draw(){
 	ofSetColor(255);
 
 	// draw room
-	background.draw(marginTop, marginLeft);
+	background.draw(marginLeft, marginTop);
 
 	// draw player
-	player->Draw(marginLeft, marginTop + backgroundHeight - 3*scalingFactor);
+	player->Draw(marginLeft, marginTop + backgroundHeight - playerHeight - 3*scalingFactor);
 
 
 	ofSetHexColor(0x000000);
