@@ -3,6 +3,10 @@
 
 #include "ofMain.h"
 
+struct Player;
+struct PlayerAction;
+struct Room;
+
 enum RoomExit
 {
 	RoomExit_StairsUp,
@@ -19,6 +23,11 @@ struct Room
 	std::list<PlayerAction *> actions;
 };
 
+struct PlayerAction
+{
+	virtual PlayerAction * Update(Player * player);
+};
+
 enum PlayerState
 {
 	PlayerState_Walk,
@@ -26,25 +35,12 @@ enum PlayerState
 	PlayerState_PerformAction,
 };
 
-struct PlayerAction
-{
-	virtual PlayerAction * Update(Player * player);
-};
-
 struct Player
 {
-	static const int spriteWalkCycle = 6;
-	static const char* spriteWalkFiles[] = {
-		"sprites/person_walk0.png",
-		"sprites/person_walk1.png",
-		"sprites/person_walk2.png",
-		"sprites/person_walk3.png",
-		"sprites/person_walk4.png",
-		"sprites/person_walk5.png",
-	};
+	static const int spriteWalkCount = 6;
 	int spriteWalkIndex = 0;
 
-	ofImage spriteWalk[spriteWalkCycle];// ofImage-array of spriteWalkCycle elements
+	ofImage spriteWalk[spriteWalkCount];// ofImage-array of spriteWalkCount elements
 	ofImage spriteFaceBack;
 	ofImage spriteFaceFront;
 
@@ -55,79 +51,8 @@ struct Player
 	ofVec2f pos;
 	ofVec2f vel;
 
-	void Init()
-	{
-		// load sprites
-
-		// set initial position
-		
-		// set initial room
-	}
-	
-	void Update()
-	{
-		bool pressedL = ofGetKeyPressed(OF_KEY_LEFT);// left
-		bool pressedR = ofGetKeyPressed(OF_KEY_RIGHT);// right
-		bool pressedA = ofGetKeyPressed(' ');// action!
-
-		if (pressedL && pressedR)
-		{
-			pressedL = false;
-			pressedR = false;
-		}
-
-		switch (state)
-		{
-			case PlayerState_Walk:
-			{
-				if (pressedA)
-				{
-					state = PlayerState_FindAction;
-				}
-				else
-				{
-					if (pressedL)
-						vel.x = -1.0f;
-					if (pressedR)
-						vel.x = 1.0f;
-
-					pos.x += vel.x;
-					//TODO: test if we pass through an exit
-				}
-			} break;
-
-			case PlayerState_FindAction:
-			{
-				if (pressedA)
-				{
-					//TODO: find action
-					//action = room->FindAction(this);
-					action = nullptr;
-					if (action != nullptr)
-					{
-						state = PlayerState_PerformAction;
-					}
-				}
-				else
-				{
-					state = PlayerState_Walk;
-				}
-			} break;
-
-			case PlayerState_PerformAction:
-			{
-				if (action != nullptr)
-				{
-					action = action->Update(this);
-				}
-
-				if (action == nullptr);
-				{
-					state = PlayerState_FindAction;
-				}
-			} break;
-		}
-	}
+	void Init();
+	void Update();
 };
 
 #endif//__ENTITIES_H__
