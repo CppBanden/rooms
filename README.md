@@ -1,2 +1,2 @@
 # rooms
-special pixels art game
+special pixel art game
