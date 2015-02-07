@@ -7,25 +7,20 @@ struct Player;
 struct PlayerAction;
 struct Room;
 
-enum RoomExit
-{
-	RoomExit_StairsUp,
-	RoomExit_StairsDown,
-	RoomExit_DoorEast,
-	RoomExit_DoorWest,
-};
-
 struct Room
 {
-	ofImage background;
-	ofImage foreground;
+	float opacity;
+	ofImage bgImage;
+	ofImage fgImage;
 
 	std::list<PlayerAction *> actions;
-};
 
-struct PlayerAction
-{
-	virtual PlayerAction * Update(Player * player);
+	void Init(const char * bgFilename, const char * fgFilename);
+	void Update();
+	void DrawBack(int offsetX, int offsetY);
+	void DrawFront(int offsetX, int offsetY);
+
+	PlayerAction * FindAction(Player * player);
 };
 
 enum PlayerState
@@ -33,6 +28,15 @@ enum PlayerState
 	PlayerState_Walk,
 	PlayerState_FindAction,
 	PlayerState_PerformAction,
+};
+
+struct PlayerAction
+{
+	PlayerState requiredState;
+	ofVec2f pos;
+	ofVec2f dim;
+
+	virtual PlayerAction * Update(Player * player) = 0;
 };
 
 struct Player
@@ -56,6 +60,12 @@ struct Player
 	void SetFacing(float facing);
 	void Update();
 	void Draw(int offsetX, int offsetY);
+};
+
+struct World
+{
+	Player * player;
+	std::list<Room *> rooms;
 };
 
 #endif//__ENTITIES_H__

@@ -145,3 +145,75 @@ void Player::Draw(int offsetX, int offsetY)
 		image->draw(x, y);
 	}
 }
+
+void Room::Init(const char * bgFilename, const char * fgFilename)
+{
+	opacity = 0.0f;
+
+	if (bgFilename != NULL)
+	{
+		bgImage.loadImage(bgFilename);
+		bgImage.getPixelsRef().resize(ofApp::backgroundWidth, ofApp::backgroundHeight, OF_INTERPOLATE_NEAREST_NEIGHBOR);
+		bgImage.update();
+	}
+
+	if (fgFilename != NULL)
+	{
+		fgImage.loadImage(fgFilename);
+		fgImage.getPixelsRef().resize(ofApp::backgroundWidth, ofApp::backgroundHeight, OF_INTERPOLATE_NEAREST_NEIGHBOR);
+		fgImage.update();
+	}
+}
+
+void Room::Update()
+{
+}
+
+void Room::DrawBack(int offsetX, int offsetY)
+{
+	if (!bgImage.isAllocated())
+		return;
+
+	float x = offsetX;
+	float y = offsetY;
+
+	bgImage.draw(x, y);
+}
+
+void Room::DrawFront(int offsetX, int offsetY)
+{
+	if (!fgImage.isAllocated())
+		return;
+
+	float x = offsetX;
+	float y = offsetY;
+
+	fgImage.draw(x, y);
+}
+
+PlayerAction * Room::FindAction(Player * player)
+{
+	float pMinX = player->pos.x;
+	float pMaxX = player->pos.x + ofApp::playerWidth;
+	float pMinY = player->pos.y;
+	float pMaxY = player->pos.y + ofApp::playerHeight;
+
+	for (std::list<PlayerAction *>::iterator it = actions.begin(); it != actions.end(); it++)
+	{
+		PlayerAction * action = *it;
+		float aMinX = action->pos.x;
+		float aMaxX = action->pos.x + action->dim.x;
+		float aMinY = action->pos.y;
+		float aMaxY = action->pos.y + action->dim.y;
+
+		bool overlapX = (pMinX < aMinX && aMinX < pMaxX) || (pMinX < aMaxX && aMaxX < pMaxX);
+		bool overlapY = (pMinY < aMinY && aMinY < pMaxY) || (pMinY < aMaxY && aMaxY < pMaxY);
+
+		if (overlapX && overlapY && action->requiredState == player->state)
+		{
+			return action;
+		}
+	}
+
+	return NULL;
+}
