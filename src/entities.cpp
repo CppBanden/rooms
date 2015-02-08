@@ -1,6 +1,12 @@
 #include "entities.h"
 #include "ofApp.h"
 
+void DrawPixelPerfect(ofImage * image, float x, float y, float w, float h)
+{
+	float s = ofApp::scalingFactor;
+	image->drawSubsection(x, y, w, h, 0.0f, 0.0f, w / s, h / s);
+}
+
 void Player::Init()
 {
 	// load sprites
@@ -10,16 +16,16 @@ void Player::Init()
 	{
 		sprintf(filename, "sprites/person_walk%d.png", i >> 1);
 		spriteWalk[i].loadImage(filename);
-		spriteWalk[i].getPixelsRef().resize(ofApp::playerWidth, ofApp::playerHeight, OF_INTERPOLATE_NEAREST_NEIGHBOR);
+		spriteWalk[i].getTextureReference().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
 		spriteWalk[i].update();
 	}
 
 	spriteFaceBack.loadImage("sprites/person_back.png");
-	spriteFaceBack.getPixelsRef().resize(ofApp::playerWidth, ofApp::playerHeight, OF_INTERPOLATE_NEAREST_NEIGHBOR);
+	spriteFaceBack.getTextureReference().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
 	spriteFaceBack.update();
 
 	spriteFaceFront.loadImage("sprites/person_front.png");
-	spriteFaceFront.getPixelsRef().resize(ofApp::playerWidth, ofApp::playerHeight, OF_INTERPOLATE_NEAREST_NEIGHBOR);
+	spriteFaceFront.getTextureReference().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
 	spriteFaceFront.update();
 
 	// set initial position
@@ -137,9 +143,6 @@ void Player::Update()
 
 void Player::Draw()
 {
-	float x = room->pos.x + pos.x;
-	float y = room->pos.y + pos.y;
-
 	ofImage * image = NULL;
 
 	switch (state)
@@ -151,8 +154,47 @@ void Player::Draw()
 
 	if (image != NULL)
 	{
+		float minX = room->pos.x;
+		float minY = room->pos.y;
+		float maxX = room->pos.x + ofApp::backgroundWidth;
+		float maxY = room->pos.y + ofApp::backgroundHeight;
+
+		float x = room->pos.x + pos.x;
+		float y = room->pos.y + pos.y;
+
+		float w = ofApp::playerWidth;
+		float h = ofApp::playerHeight;
+		float s = ofApp::scalingFactor;
+
+		float sx = 0.0f;
+		float sy = 0.0f;
+		float sw = w;
+		float sh = h;
+
+		if (x < minX)
+		{
+			float d = std::min(minX - x, w);
+			x = minX; w -= d; sx = d; sw -= d;
+		}
+		else if (x > maxX - w)
+		{
+			float d = std::min(x - (maxX - w), w);
+			w -= d; sw -= d;
+		}
+
+		if (y < minY)
+		{
+			float d = std::min(minY - y, h);
+			y = minY; h -= d; sy = d; sh -= d;
+		}
+		else if (y > maxY - h)
+		{
+			float d = std::min(y - (maxY - h), h);
+			h -= d; sh -= d;
+		}
+
 		ofSetColor(255 * room->opacity);
-		image->draw(x, y);
+		image->drawSubsection(x, y, w, h, sx/s, sy/s, sw/s, sh/s);
 		ofSetColor(255);
 	}
 }
@@ -164,14 +206,14 @@ void Room::Init(const char * bgFilename, const char * fgFilename)
 	if (bgFilename != NULL)
 	{
 		bgImage.loadImage(bgFilename);
-		bgImage.getPixelsRef().resize(ofApp::backgroundWidth, ofApp::backgroundHeight, OF_INTERPOLATE_NEAREST_NEIGHBOR);
+		bgImage.getTextureReference().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
 		bgImage.update();
 	}
 
 	if (fgFilename != NULL)
 	{
 		fgImage.loadImage(fgFilename);
-		fgImage.getPixelsRef().resize(ofApp::backgroundWidth, ofApp::backgroundHeight, OF_INTERPOLATE_NEAREST_NEIGHBOR);
+		fgImage.getTextureReference().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
 		fgImage.update();
 	}
 }
@@ -186,7 +228,7 @@ void Room::DrawBack()
 		return;
 
 	ofSetColor(255 * opacity);
-	bgImage.draw(pos.x, pos.y);
+	DrawPixelPerfect(&bgImage, pos.x, pos.y, ofApp::backgroundWidth, ofApp::backgroundHeight);
 	ofSetColor(255);
 }
 
@@ -211,7 +253,7 @@ void Room::DrawFront()
 		return;
 
 	ofSetColor(255 * opacity);
-	fgImage.draw(pos.x, pos.y);
+	DrawPixelPerfect(&fgImage, pos.x, pos.y, ofApp::backgroundWidth, ofApp::backgroundHeight);
 	ofSetColor(255);
 }
 
@@ -232,8 +274,6 @@ PlayerAction * Room::FindAction(Player * player)
 
 		bool outsideX = (pMaxX < aMinX) || (pMinX > aMaxX);
 		bool outsideY = (pMaxY < aMinY) || (pMinY > aMaxY);
-
-		std::cout << "outsideX " << outsideX << " outsideY " << outsideY << std::endl;
 
 		if (!outsideX && !outsideY && action->requiredState == player->state)
 		{
