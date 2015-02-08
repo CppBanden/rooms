@@ -71,6 +71,14 @@ void Player::Update()
 	{
 		case PlayerState_Walk:
 		{
+			if (pos.y < ofApp::backgroundHeight - ofApp::playerHeight - 3 * ofApp::scalingFactor)
+			{
+				pos.y += ofApp::scalingFactor;
+				pressedL = false;
+				pressedR = false;
+				pressedA = false;
+			}
+
 			if (pressedA)
 			{
 				state = PlayerState_FindAction;

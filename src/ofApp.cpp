@@ -208,9 +208,9 @@ void ofApp::setup()
 	// init player
 	player = new Player();
 	player->Init();
-	player->pos.x = backgroundWidth / 2;
+	player->pos.x = scalingFactor * 3;
 	player->pos.y = backgroundHeight - playerHeight - 3 * scalingFactor;
-	player->room = room2;
+	player->room = room1;
 	player->room->pos = ofVec2f(marginLeft, marginTop);
 	player->room->opacity = 1.0f;
 }
