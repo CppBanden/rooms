@@ -63,7 +63,12 @@ struct Player
 	ofVec2f vel;
 	float facing;
 
+	ofSoundPlayer footsteps[8];
+	int footstepCount;
+	int footstepIndex;
+
 	void Init();
+	void Footstep();
 	void SetFacing(float facing);
 	void Update();
 	void Draw();

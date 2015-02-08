@@ -42,6 +42,17 @@ void Player::Init()
 	spriteFaceFrontDark.getTextureReference().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
 	spriteFaceFrontDark.update();
 
+	// load footsteps
+	footstepCount = 8;
+	for (int i = 0; i != footstepCount; i++)
+	{
+		char filename[256];
+		sprintf(filename, "sounds/Lasses_Tippi_footsteps_%d.wav", i + 1);
+		footsteps[i].loadSound(filename, false);
+		footsteps[i].setLoop(false);
+		footsteps[i].setVolume(0.1f);
+	}
+
 	// set initial position
 	pos = ofVec2f(0.0f, 0.0f);
 	vel = ofVec2f(0.0f, 0.0f);
@@ -70,6 +81,15 @@ void Player::SetFacing(float facing)
 	spriteFaceBackDark.mirror(false, true);
 	spriteFaceFront.mirror(false, true);
 	spriteFaceFrontDark.mirror(false, true);
+}
+
+void Player::Footstep()
+{
+	footstepIndex = (int)ofRandom(7.0f);
+	//footstepIndex++;
+	//footstepIndex %= footstepCount;
+	footsteps[footstepIndex].play();
+	footsteps[footstepIndex].setVolume(0.1f);
 }
 
 void Player::Update()
@@ -114,6 +134,7 @@ void Player::Update()
 					{
 						SetFacing(pressedL ? -1.0f : 1.0f);
 						vel.x = facing * (ofApp::scalingFactor * 1.0f);
+						Footstep();
 					}
 					else
 					{

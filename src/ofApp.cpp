@@ -148,9 +148,17 @@ struct Door : PlayerAction
 //--------------------------------------------------------------
 void ofApp::setup()
 {
+	musicVolume = 0.0f;
+	musicVolumeStep = 0.01f;
+
+	music.setVolume(musicVolume);
+	music.loadSound("sounds/Lasses_Tippi_music.wav", false);
+	music.setLoop(true);
+	music.play();
+
 	ofBackground(0, 0, 0);
 	ofSetWindowTitle("rooms");
-	ofSetFrameRate(60); // if vertical sync is off, we can go a bit fast... this caps the framerate at 15fps.
+	ofSetFrameRate(10); // if vertical sync is off, we can go a bit fast... this caps the framerate at 15fps.
 
 	// create room 0
 	Room * room0 = new Room();
@@ -249,7 +257,7 @@ void ofApp::setup()
 	door4d->requiredState = PlayerState_Walk;
 	door4d->dim.x = playerWidth;
 	door4d->dim.y = backgroundHeight;
-	door4d->pos.x = backgroundWidth * 0.75f;
+	door4d->pos.x = backgroundWidth - 4 * playerWidth;
 	door4d->pos.y = 0.0f;
 	door4d->dir = Door::DownStart;
 	room4->actions.push_back(door4d);
@@ -289,9 +297,9 @@ void ofApp::setup()
 	// init player
 	player = new Player();
 	player->Init();
-	player->pos.x = playerWidth;// start off-screen
+	player->pos.x = -playerWidth;// start off-screen
 	player->pos.y = backgroundHeight - playerHeight - 3 * scalingFactor;
-	player->room = room3;
+	player->room = room0;
 	player->room->pos = ofVec2f(marginLeft, marginTop);
 	player->room->opacity = 1.0f;
 }
@@ -299,6 +307,14 @@ void ofApp::setup()
 //--------------------------------------------------------------
 void ofApp::update()
 {
+	musicVolume += musicVolumeStep;
+	if (musicVolume > 1.0f)
+		musicVolume = 1.0f;
+	if (musicVolume < 0.0f)
+		musicVolume = 0.0f;
+
+	music.setVolume(musicVolume * 1.0f);
+
 	player->Update();
 }
 

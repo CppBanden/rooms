@@ -37,4 +37,9 @@ class ofApp : public ofBaseApp
 
 		Player *			player;
 		std::list<Room *>	rooms;
+
+		float musicVolume;
+		float musicVolumeStep;
+
+		ofSoundPlayer music;
 };
