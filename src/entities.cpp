@@ -211,11 +211,6 @@ void Room::DrawFront()
 	ofSetColor(255 * opacity);
 	fgImage.draw(pos.x, pos.y);
 	ofSetColor(255);
-
-	// draw black border to cut player
-	ofFill();
-	ofSetHexColor(0x000000);
-	ofRect(ofApp::marginLeft - ofApp::playerWidth, ofApp::marginTop, ofApp::playerWidth, ofApp::marginTop);
 }
 
 PlayerAction * Room::FindAction(Player * player)
