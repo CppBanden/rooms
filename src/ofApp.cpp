@@ -150,7 +150,7 @@ void ofApp::setup()
 {
 	ofBackground(0, 0, 0);
 	ofSetWindowTitle("rooms");
-	ofSetFrameRate(10); // if vertical sync is off, we can go a bit fast... this caps the framerate at 15fps.
+	ofSetFrameRate(60); // if vertical sync is off, we can go a bit fast... this caps the framerate at 15fps.
 
 	// create room 0
 	Room * room0 = new Room();
@@ -220,7 +220,26 @@ void ofApp::setup()
 	room2->actions.push_back(door2d);
 
 	// create room 3
-	//TODO
+	Room * room3 = new Room();
+	room3->Init("sprites/room5b_bg.png", "sprites/room5b_fg.png");
+
+	Door * door3e = new Door();
+	door3e->requiredState = PlayerState_Walk;
+	door3e->dim.x = 20.0f * scalingFactor;
+	door3e->dim.y = backgroundHeight;	
+	door3e->pos.x = backgroundWidth;
+	door3e->pos.y = 0.0f;
+	door3e->dir = Door::Right;
+	room3->actions.push_back(door3e);
+
+	Door * door3w = new Door();
+	door3w->requiredState = PlayerState_Walk;
+	door3w->dim.x = 20.0f * scalingFactor;
+	door3w->dim.y = backgroundHeight;	
+	door3w->pos.x = 0.0f - door1w->dim.x;
+	door3w->pos.y = 0.0f;
+	door3w->dir = Door::Left;
+	room3->actions.push_back(door3w);
 
 	// create room 4
 	Room * room4 = new Room();
@@ -235,30 +254,44 @@ void ofApp::setup()
 	door4d->dir = Door::DownStart;
 	room4->actions.push_back(door4d);
 
+	Door * door4w = new Door();
+	door4w->requiredState = PlayerState_Walk;
+	door4w->dim.x = 20.0f * scalingFactor;
+	door4w->dim.y = backgroundHeight;	
+	door4w->pos.x = 0.0f - door1w->dim.x;
+	door4w->pos.y = 0.0f;
+	door4w->dir = Door::Left;
+	room4->actions.push_back(door4w);
+
 	// link doors
 	door0e->targetRoom = room1;
 
+	door1w->targetRoom = room0;
 	door1e->targetRoom = room2;
-	door1w->targetRoom = room2;
 
-	door2e->targetRoom = room1;
 	door2w->targetRoom = room1;
+	door2e->targetRoom = room3;
 	door2d->targetRoom = room4;
 
+	door3w->targetRoom = room2;
+	door3e->targetRoom = room4;
+
+	door4w->targetRoom = room3;
 	door4d->targetRoom = room0;
 
 	// init rooms
 	rooms.push_back(room0);
 	rooms.push_back(room1);
 	rooms.push_back(room2);
+	rooms.push_back(room3);
 	rooms.push_back(room4);
 
 	// init player
 	player = new Player();
 	player->Init();
-	player->pos.x = -playerWidth;// start off-screen
+	player->pos.x = playerWidth;// start off-screen
 	player->pos.y = backgroundHeight - playerHeight - 3 * scalingFactor;
-	player->room = room0;
+	player->room = room3;
 	player->room->pos = ofVec2f(marginLeft, marginTop);
 	player->room->opacity = 1.0f;
 }

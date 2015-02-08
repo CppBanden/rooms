@@ -63,10 +63,13 @@ void Player::SetFacing(float facing)
 	for (int i = 0; i != spriteWalkCount; i++)
 	{
 		spriteWalk[i].mirror(false, true);
+		spriteWalkDark[i].mirror(false, true);
 	}
 
 	spriteFaceBack.mirror(false, true);
+	spriteFaceBackDark.mirror(false, true);
 	spriteFaceFront.mirror(false, true);
+	spriteFaceFrontDark.mirror(false, true);
 }
 
 void Player::Update()
