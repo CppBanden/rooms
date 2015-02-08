@@ -11,17 +11,20 @@ struct Room
 {
 	bool dark;
 	float opacity;
+	float opacityText;
 	ofImage bgImage;
 	ofImage fgImage;
+	ofImage txImage;
 	ofVec2f pos;
 
 	std::list<PlayerAction *> actions;
 
-	void Init(const char * bgFilename, const char * fgFilename);
+	void Init(const char * bgFilename, const char * fgFilename, const char * txFilename);
 	void Update();
 	void DrawBack();
 	void DrawActions();
 	void DrawFront();
+	void DrawText();
 
 	PlayerAction * FindAction(Player * player);
 };

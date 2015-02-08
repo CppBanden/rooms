@@ -199,18 +199,19 @@ void Player::Draw()
 			else
 				image = &spriteWalk[spriteWalkIndex];
 		} break;
-		case PlayerState_FindAction: {
+		case PlayerState_FindAction:
+		case PlayerState_PerformAction: {
 			if (room->dark)
 				image = &spriteFaceBackDark;
 			else	
 				image = &spriteFaceBack;
 		} break;
-		case PlayerState_PerformAction: {
-			if (room->dark)
-				image = &spriteFaceFrontDark;
-			else
-				image = &spriteFaceFront;
-		} break;
+		//case PlayerState_PerformAction: {
+		//	if (room->dark)
+		//		image = &spriteFaceFrontDark;
+		//	else
+		//		image = &spriteFaceFront;
+		//} break;
 	}
 
 	if (image != NULL)
@@ -260,10 +261,11 @@ void Player::Draw()
 	}
 }
 
-void Room::Init(const char * bgFilename, const char * fgFilename)
+void Room::Init(const char * bgFilename, const char * fgFilename, const char * txFilename)
 {
 	dark = false;
 	opacity = 0.0f;
+	opacityText = 0.0f;
 
 	if (bgFilename != NULL)
 	{
@@ -278,10 +280,22 @@ void Room::Init(const char * bgFilename, const char * fgFilename)
 		fgImage.getTextureReference().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
 		fgImage.update();
 	}
+
+	if (txFilename != NULL)
+	{
+		txImage.loadImage(txFilename);
+		txImage.getTextureReference().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
+		txImage.update();
+	}
 }
 
 void Room::Update()
 {
+	opacityText += 0.01f;
+	if (opacityText > 1.0f)
+		opacityText = 1.0f;
+	else if (opacityText < 0.0f)
+		opacityText = 0.0;
 }
 
 void Room::DrawBack()
@@ -316,6 +330,16 @@ void Room::DrawFront()
 
 	ofSetColor(255, 255, 255, 255 * opacity);
 	DrawPixelPerfect(&fgImage, pos.x, pos.y, ofApp::backgroundWidth, ofApp::backgroundHeight);
+	ofSetColor(255);
+}
+
+void Room::DrawText()
+{
+	if (!txImage.isAllocated())
+		return;
+
+	ofSetColor(180, 200, 255, 255 * (opacity * opacityText * 0.08f));
+	DrawPixelPerfect(&txImage, pos.x, pos.y + ofApp::backgroundHeight, ofApp::backgroundWidth, ofApp::playerHeight);
 	ofSetColor(255);
 }
 

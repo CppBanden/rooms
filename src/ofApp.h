@@ -38,6 +38,9 @@ class ofApp : public ofBaseApp
 		Player *			player;
 		std::list<Room *>	rooms;
 
+		Room * grave;
+		Room * black;
+
 		float musicVolume;
 		float musicVolumeStep;
 

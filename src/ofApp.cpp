@@ -17,13 +17,20 @@ struct Door : PlayerAction
 	Room * sourceRoom;
 	Room * targetRoom;
 
+	int delay;
+	int delayRemaining;
+
 	float stepCount;
 	float stepX;
 	float stepY;
 	float stepOpacity;
 
+	Door() : delay(0) {}
+
 	void Start(Player * player)
 	{
+		delayRemaining = delay;
+
 		sourceRoom = player->room;
 
 		float margin = ofApp::scalingFactor * 10.0f;
@@ -69,6 +76,9 @@ struct Door : PlayerAction
 
 	PlayerAction * Update(Player * player)
 	{
+		if (--delayRemaining > 0)
+			return this;
+
 		sourceRoom->opacity = std::max(0.0f, sourceRoom->opacity - stepOpacity);
 		targetRoom->opacity = std::min(1.0f, targetRoom->opacity + stepOpacity);
 
@@ -158,11 +168,11 @@ void ofApp::setup()
 
 	ofBackground(0, 0, 0);
 	ofSetWindowTitle("rooms");
-	ofSetFrameRate(10); // if vertical sync is off, we can go a bit fast... this caps the framerate at 15fps.
+	ofSetFrameRate(10);//10); // if vertical sync is off, we can go a bit fast... this caps the framerate at 15fps.
 
 	// create room 0
 	Room * room0 = new Room();
-	room0->Init("sprites/room0_bg.png", NULL);
+	room0->Init("sprites/room0_bg.png", NULL, NULL);
 	room0->dark = true;
 
 	Door * door0e = new Door();
@@ -176,7 +186,7 @@ void ofApp::setup()
 
 	// create room 1
 	Room * room1 = new Room();
-	room1->Init("sprites/room1_bg.png", NULL);
+	room1->Init("sprites/room1_bg.png", NULL, "sprites/text1.png");
 
 	Door * door1e = new Door();
 	door1e->requiredState = PlayerState_Walk;
@@ -198,7 +208,7 @@ void ofApp::setup()
 
 	// create room 2
 	Room * room2 = new Room();
-	room2->Init("sprites/room2_bg2.png", NULL);
+	room2->Init("sprites/room2_bg2.png", NULL, "sprites/text2.png");
 
 	Door * door2e = new Door();
 	door2e->requiredState = PlayerState_Walk;
@@ -229,7 +239,7 @@ void ofApp::setup()
 
 	// create room 3
 	Room * room3 = new Room();
-	room3->Init("sprites/room5b_bg.png", "sprites/room5b_fg.png");
+	room3->Init("sprites/room5b_bg.png", "sprites/room5b_fg.png", "sprites/text3.png");
 
 	Door * door3e = new Door();
 	door3e->requiredState = PlayerState_Walk;
@@ -251,13 +261,14 @@ void ofApp::setup()
 
 	// create room 4
 	Room * room4 = new Room();
-	room4->Init("sprites/room3_bg.png", NULL);
+	room4->Init("sprites/room3_bg.png", "sprites/room3_fg.png", "sprites/text4.png");
 
 	Door * door4d = new Door();
-	door4d->requiredState = PlayerState_Walk;
+	door4d->requiredState = PlayerState_FindAction;
+	door4d->delay = 120;
 	door4d->dim.x = playerWidth;
 	door4d->dim.y = backgroundHeight;
-	door4d->pos.x = backgroundWidth - 4 * playerWidth;
+	door4d->pos.x = backgroundWidth - 2 * playerWidth;
 	door4d->pos.y = 0.0f;
 	door4d->dir = Door::DownStart;
 	room4->actions.push_back(door4d);
@@ -294,6 +305,9 @@ void ofApp::setup()
 	rooms.push_back(room3);
 	rooms.push_back(room4);
 
+	grave = room4;
+	black = room0;
+
 	// init player
 	player = new Player();
 	player->Init();
@@ -315,7 +329,15 @@ void ofApp::update()
 
 	music.setVolume(musicVolume * 1.0f);
 
+	Room * oldRoom = player->room;
+
+	oldRoom->Update();
 	player->Update();
+
+	if (oldRoom == grave && player->room == black && musicVolumeStep > 0.0f)
+	{
+		musicVolumeStep *= -2.0f;
+	}
 }
 
 //--------------------------------------------------------------
@@ -333,11 +355,13 @@ void ofApp::draw()
 		}
 
 		room->DrawFront();
+		room->DrawText();
 	}
 
-	float tx = 0.0f;
-	float ty = 0.0f;
-	ofDrawBitmapString("hello world", tx, ty);
+	//float tx = 0.0f;
+	//float ty = 0.0f;
+	//ofSetHexColor(0xFFFFFFFF);
+	//ofDrawBitmapString("hello!", marginLeft, marginTop + backgroundHeight);
 }
 
 
