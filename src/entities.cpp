@@ -88,7 +88,7 @@ void Player::Update()
 					if (pressedL || pressedR)
 					{
 						SetFacing(pressedL ? -1.0f : 1.0f);
-						vel.x = facing * (ofApp::scalingFactor * 1.0f);
+						vel.x = facing * (ofApp::scalingFactor * 0.5f);
 					}
 					else
 					{
@@ -149,7 +149,7 @@ void Player::Draw()
 	{
 	case PlayerState_Walk: image = &spriteWalk[spriteWalkIndex]; break;
 	case PlayerState_FindAction: image = &spriteFaceBack; break;
-	case PlayerState_PerformAction: image = &spriteFaceBack; break;
+	case PlayerState_PerformAction: image = &spriteFaceFront; break;
 	}
 
 	if (image != NULL)
@@ -227,7 +227,7 @@ void Room::DrawBack()
 	if (!bgImage.isAllocated())
 		return;
 
-	ofSetColor(255 * opacity);
+	ofSetColor(255, 255, 255, 255 * opacity);
 	DrawPixelPerfect(&bgImage, pos.x, pos.y, ofApp::backgroundWidth, ofApp::backgroundHeight);
 	ofSetColor(255);
 }
@@ -252,7 +252,7 @@ void Room::DrawFront()
 	if (!fgImage.isAllocated())
 		return;
 
-	ofSetColor(255 * opacity);
+	ofSetColor(255, 255, 255, 255 * opacity);
 	DrawPixelPerfect(&fgImage, pos.x, pos.y, ofApp::backgroundWidth, ofApp::backgroundHeight);
 	ofSetColor(255);
 }
