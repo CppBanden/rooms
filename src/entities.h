@@ -9,6 +9,7 @@ struct Room;
 
 struct Room
 {
+	bool dark;
 	float opacity;
 	ofImage bgImage;
 	ofImage fgImage;
@@ -48,8 +49,11 @@ struct Player
 	int spriteWalkIndex;
 
 	ofImage spriteWalk[spriteWalkCount];// ofImage-array of spriteWalkCount elements
+	ofImage spriteWalkDark[spriteWalkCount];// ofImage-array of spriteWalkCount elements
 	ofImage spriteFaceBack;
+	ofImage spriteFaceBackDark;
 	ofImage spriteFaceFront;
+	ofImage spriteFaceFrontDark;
 
 	Room * room;
 	PlayerState state;

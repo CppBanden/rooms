@@ -1,5 +1,6 @@
 #include "ofApp.h"
 #include "entities.h"
+#include <cmath>
 
 struct Door : PlayerAction
 {
@@ -9,6 +10,7 @@ struct Door : PlayerAction
 		Right,
 		Up,
 		Down,
+		DownStart,
 	};
 
 	Direction dir;
@@ -50,6 +52,11 @@ struct Door : PlayerAction
 				offsetX = 0.0f;
 				offsetY *= 1.0f;
 			} break;
+			case DownStart:
+			{
+				offsetX = 0.0f;
+				offsetY *= 1.0f;
+			} break;
 		}
 
 		targetRoom->pos = ofVec2f(ofApp::marginLeft + offsetX, ofApp::marginTop + offsetY);
@@ -68,14 +75,17 @@ struct Door : PlayerAction
 		sourceRoom->pos += ofVec2f(stepX, stepY);
 		targetRoom->pos += ofVec2f(stepX, stepY);
 
-		if (stepX > 0.0f)
-			player->pos.x -= ofApp::scalingFactor;
-		else if (stepX < 0.0f)
-			player->pos.x += ofApp::scalingFactor;
-		if (stepY > 0.0f)
-			player->pos.y -= ofApp::scalingFactor;
-		else if (stepY < 0.0f)
-			player->pos.y += ofApp::scalingFactor;
+		if (sourceRoom->opacity > 0.75 || targetRoom->opacity > 0.75f)
+		{
+			if (stepX > 0.0f)
+				player->pos.x -= ofApp::scalingFactor;
+			else if (stepX < 0.0f)
+				player->pos.x += ofApp::scalingFactor;
+			if (stepY > 0.0f)
+				player->pos.y -= ofApp::scalingFactor;
+			else if (stepY < 0.0f)
+				player->pos.y += ofApp::scalingFactor;
+		}
 
 		if (targetRoom->opacity > 0.5f)
 		{
@@ -96,6 +106,10 @@ struct Door : PlayerAction
 					case Down: {
 						player->pos.y = -ofApp::playerHeight;
 					} break;
+					case DownStart: {
+						player->pos.y = -ofApp::playerHeight;
+						player->pos.x = ofApp::playerWidth;
+					} break;
 				}
 			}
 			
@@ -111,6 +125,9 @@ struct Door : PlayerAction
 					player->pos.y = std::fmaxf(player->pos.y, ofApp::backgroundHeight - ofApp::playerHeight - ofApp::scalingFactor);
 				} break;
 				case Down: {
+					player->pos.y = std::fminf(player->pos.y, ofApp::scalingFactor);
+				} break;
+				case DownStart: {
 					player->pos.y = std::fminf(player->pos.y, ofApp::scalingFactor);
 				} break;
 			}
@@ -133,7 +150,21 @@ void ofApp::setup()
 {
 	ofBackground(0, 0, 0);
 	ofSetWindowTitle("rooms");
-	ofSetFrameRate(15); // if vertical sync is off, we can go a bit fast... this caps the framerate at 15fps.
+	ofSetFrameRate(60); // if vertical sync is off, we can go a bit fast... this caps the framerate at 15fps.
+
+	// create room 0
+	Room * room0 = new Room();
+	room0->Init("sprites/room0_bg.png", NULL);
+	room0->dark = true;
+
+	Door * door0e = new Door();
+	door0e->requiredState = PlayerState_Walk;
+	door0e->dim.x = 20.0f * scalingFactor;
+	door0e->dim.y = backgroundHeight;	
+	door0e->pos.x = backgroundWidth;
+	door0e->pos.y = 0.0f;
+	door0e->dir = Door::Right;
+	room0->actions.push_back(door0e);
 
 	// create room 1
 	Room * room1 = new Room();
@@ -159,7 +190,7 @@ void ofApp::setup()
 
 	// create room 2
 	Room * room2 = new Room();
-	room2->Init("sprites/room2_bg.png", "sprites/room2_fg.png");
+	room2->Init("sprites/room2_bg2.png", NULL);
 
 	Door * door2e = new Door();
 	door2e->requiredState = PlayerState_Walk;
@@ -188,29 +219,79 @@ void ofApp::setup()
 	door2d->dir = Door::Down;
 	room2->actions.push_back(door2d);
 
-	// create room 2
+	// create room 3
 	Room * room3 = new Room();
-	room3->Init("sprites/room3_bg.png", NULL);
+	room3->Init("sprites/room5b_bg.png", "sprites/room5b_fg.png");
+
+	Door * door3e = new Door();
+	door3e->requiredState = PlayerState_Walk;
+	door3e->dim.x = 20.0f * scalingFactor;
+	door3e->dim.y = backgroundHeight;	
+	door3e->pos.x = backgroundWidth;
+	door3e->pos.y = 0.0f;
+	door3e->dir = Door::Right;
+	room3->actions.push_back(door3e);
+
+	Door * door3w = new Door();
+	door3w->requiredState = PlayerState_Walk;
+	door3w->dim.x = 20.0f * scalingFactor;
+	door3w->dim.y = backgroundHeight;	
+	door3w->pos.x = 0.0f - door1w->dim.x;
+	door3w->pos.y = 0.0f;
+	door3w->dir = Door::Left;
+	room3->actions.push_back(door3w);
+
+	// create room 4
+	Room * room4 = new Room();
+	room4->Init("sprites/room3_bg.png", NULL);
+
+	Door * door4d = new Door();
+	door4d->requiredState = PlayerState_Walk;
+	door4d->dim.x = playerWidth;
+	door4d->dim.y = backgroundHeight;
+	door4d->pos.x = backgroundWidth * 0.75f;
+	door4d->pos.y = 0.0f;
+	door4d->dir = Door::DownStart;
+	room4->actions.push_back(door4d);
+
+	Door * door4w = new Door();
+	door4w->requiredState = PlayerState_Walk;
+	door4w->dim.x = 20.0f * scalingFactor;
+	door4w->dim.y = backgroundHeight;	
+	door4w->pos.x = 0.0f - door1w->dim.x;
+	door4w->pos.y = 0.0f;
+	door4w->dir = Door::Left;
+	room4->actions.push_back(door4w);
 
 	// link doors
-	door1e->targetRoom = room2;
-	door1w->targetRoom = room2;
+	door0e->targetRoom = room1;
 
-	door2e->targetRoom = room1;
+	door1w->targetRoom = room0;
+	door1e->targetRoom = room2;
+
 	door2w->targetRoom = room1;
-	door2d->targetRoom = room3;
+	door2e->targetRoom = room3;
+	door2d->targetRoom = room4;
+
+	door3w->targetRoom = room2;
+	door3e->targetRoom = room4;
+
+	door4w->targetRoom = room3;
+	door4d->targetRoom = room0;
 
 	// init rooms
+	rooms.push_back(room0);
 	rooms.push_back(room1);
 	rooms.push_back(room2);
 	rooms.push_back(room3);
+	rooms.push_back(room4);
 
 	// init player
 	player = new Player();
 	player->Init();
-	player->pos.x = scalingFactor * 3;
+	player->pos.x = playerWidth;// start off-screen
 	player->pos.y = backgroundHeight - playerHeight - 3 * scalingFactor;
-	player->room = room1;
+	player->room = room3;
 	player->room->pos = ofVec2f(marginLeft, marginTop);
 	player->room->opacity = 1.0f;
 }
@@ -224,8 +305,6 @@ void ofApp::update()
 //--------------------------------------------------------------
 void ofApp::draw()
 {
-	const float opacityStep = 1.0f / 20.0f;
-
 	for (std::list<Room *>::iterator it = rooms.begin(); it != rooms.end(); it++)
 	{
 		Room * room = *it;
@@ -239,6 +318,10 @@ void ofApp::draw()
 
 		room->DrawFront();
 	}
+
+	float tx = 0.0f;
+	float ty = 0.0f;
+	ofDrawBitmapString("hello world", tx, ty);
 }
 
 

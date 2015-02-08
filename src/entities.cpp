@@ -1,5 +1,6 @@
 #include "entities.h"
 #include "ofApp.h"
+#include <cmath>
 
 void DrawPixelPerfect(ofImage * image, float x, float y, float w, float h)
 {
@@ -18,15 +19,28 @@ void Player::Init()
 		spriteWalk[i].loadImage(filename);
 		spriteWalk[i].getTextureReference().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
 		spriteWalk[i].update();
+
+		sprintf(filename, "sprites/persongrey_walk%d.png", i >> 1);
+		spriteWalkDark[i].loadImage(filename);
+		spriteWalkDark[i].getTextureReference().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
+		spriteWalkDark[i].update();
 	}
 
 	spriteFaceBack.loadImage("sprites/person_back.png");
 	spriteFaceBack.getTextureReference().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
 	spriteFaceBack.update();
 
+	spriteFaceBackDark.loadImage("sprites/persongrey_back.png");
+	spriteFaceBackDark.getTextureReference().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
+	spriteFaceBackDark.update();
+
 	spriteFaceFront.loadImage("sprites/person_front.png");
 	spriteFaceFront.getTextureReference().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
 	spriteFaceFront.update();
+
+	spriteFaceFrontDark.loadImage("sprites/persongrey_front.png");
+	spriteFaceFrontDark.getTextureReference().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
+	spriteFaceFrontDark.update();
 
 	// set initial position
 	pos = ofVec2f(0.0f, 0.0f);
@@ -49,10 +63,13 @@ void Player::SetFacing(float facing)
 	for (int i = 0; i != spriteWalkCount; i++)
 	{
 		spriteWalk[i].mirror(false, true);
+		spriteWalkDark[i].mirror(false, true);
 	}
 
 	spriteFaceBack.mirror(false, true);
+	spriteFaceBackDark.mirror(false, true);
 	spriteFaceFront.mirror(false, true);
+	spriteFaceFrontDark.mirror(false, true);
 }
 
 void Player::Update()
@@ -96,7 +113,7 @@ void Player::Update()
 					if (pressedL || pressedR)
 					{
 						SetFacing(pressedL ? -1.0f : 1.0f);
-						vel.x = facing * (ofApp::scalingFactor * 0.5f);
+						vel.x = facing * (ofApp::scalingFactor * 1.0f);
 					}
 					else
 					{
@@ -155,9 +172,24 @@ void Player::Draw()
 
 	switch (state)
 	{
-	case PlayerState_Walk: image = &spriteWalk[spriteWalkIndex]; break;
-	case PlayerState_FindAction: image = &spriteFaceBack; break;
-	case PlayerState_PerformAction: image = &spriteFaceFront; break;
+		case PlayerState_Walk: {
+			if (room->dark)
+				image = &spriteWalkDark[spriteWalkIndex];
+			else
+				image = &spriteWalk[spriteWalkIndex];
+		} break;
+		case PlayerState_FindAction: {
+			if (room->dark)
+				image = &spriteFaceBackDark;
+			else	
+				image = &spriteFaceBack;
+		} break;
+		case PlayerState_PerformAction: {
+			if (room->dark)
+				image = &spriteFaceFrontDark;
+			else
+				image = &spriteFaceFront;
+		} break;
 	}
 
 	if (image != NULL)
@@ -209,6 +241,7 @@ void Player::Draw()
 
 void Room::Init(const char * bgFilename, const char * fgFilename)
 {
+	dark = false;
 	opacity = 0.0f;
 
 	if (bgFilename != NULL)
