@@ -97,7 +97,7 @@ void ofApp::draw()
 		}
 
 		room->DrawBack();
-		//room->DrawActions();// debug
+		//room->DrawActions(); // debug
 
 		if (room == player->room)
 		{
