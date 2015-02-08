@@ -78,7 +78,7 @@ void Player::Update()
 			else
 			{
 				action = room->FindAction(this);
-				if (action != nullptr)
+				if (action != NULL)
 				{
 					action->Start(this);
 					state = PlayerState_PerformAction;
@@ -115,7 +115,7 @@ void Player::Update()
 			if (pressedA)
 			{
 				action = room->FindAction(this);
-				if (action != nullptr)
+				if (action != NULL)
 				{
 					action->Start(this);
 					state = PlayerState_PerformAction;
@@ -274,6 +274,8 @@ PlayerAction * Room::FindAction(Player * player)
 
 		bool outsideX = (pMaxX < aMinX) || (pMinX > aMaxX);
 		bool outsideY = (pMaxY < aMinY) || (pMinY > aMaxY);
+
+		//std::cout << "outsideX " << outsideX << " outsideY " << outsideY << std::endl;
 
 		if (!outsideX && !outsideY && action->requiredState == player->state)
 		{

@@ -88,6 +88,7 @@ void ofApp::draw()
 
 		if (room == player->room)
 		{
+			room->pos = ofVec2f(marginLeft, marginTop);
 			room->opacity = std::min(1.0f, room->opacity + opacityStep);
 		}
 		else
@@ -96,7 +97,7 @@ void ofApp::draw()
 		}
 
 		room->DrawBack();
-		room->DrawActions();
+		//room->DrawActions(); // debug
 
 		if (room == player->room)
 		{
