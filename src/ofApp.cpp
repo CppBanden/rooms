@@ -66,7 +66,7 @@ void ofApp::setup()
 	// init player
 	player = new Player();
 	player->Init();
-	player->pos.x = backgroundWidth / 2;
+	player->pos.x = playerWidth;
 	player->pos.y = backgroundHeight - playerHeight - 3 * scalingFactor;
 	player->room = room1;
 }
