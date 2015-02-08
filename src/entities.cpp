@@ -151,7 +151,9 @@ void Player::Draw()
 
 	if (image != NULL)
 	{
+		ofSetColor(255 * room->opacity);
 		image->draw(x, y);
+		ofSetColor(255);
 	}
 }
 
