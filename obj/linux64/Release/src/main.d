@@ -309,7 +309,7 @@ obj/linux64/Release/src/main.o: src/main.cpp \
  ../../../libs/openFrameworks/video/ofVideoPlayer.h \
  ../../../libs/openFrameworks/video/ofGstVideoPlayer.h \
  ../../../libs/openFrameworks/3d/ofCamera.h \
- ../../../libs/openFrameworks/3d/ofEasyCam.h src/ofApp.h
+ ../../../libs/openFrameworks/3d/ofEasyCam.h src/ofApp.h src/entities.h
 
 ../../../libs/openFrameworks/ofMain.h:
 
@@ -966,3 +966,5 @@ obj/linux64/Release/src/main.o: src/main.cpp \
 ../../../libs/openFrameworks/3d/ofEasyCam.h:
 
 src/ofApp.h:
+
+src/entities.h:
