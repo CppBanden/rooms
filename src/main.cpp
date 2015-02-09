@@ -4,8 +4,8 @@
 //========================================================================
 int main( ){
 
-	ofSetupOpenGL(ofApp::viewportWidth,ofApp::viewportHeight,OF_WINDOW); // <-------- setup the GL context
-	//ofSetupOpenGL(ofApp::viewportWidth,ofApp::viewportHeight,OF_FULLSCREEN); // <-------- setup the GL context
+	//ofSetupOpenGL(ofApp::viewportWidth,ofApp::viewportHeight,OF_WINDOW); // <-------- setup the GL context
+	ofSetupOpenGL(ofApp::viewportWidth,ofApp::viewportHeight,OF_FULLSCREEN); // <-------- setup the GL context
 	
 	// this kicks off the running of my app
 	// can be OF_WINDOW or OF_FULLSCREEN
