@@ -162,7 +162,7 @@ void ofApp::setup()
 	musicVolumeStep = 0.01f;
 
 	music.setVolume(musicVolume);
-	music.loadSound("sounds/Lasses_Tippi_music.wav", false);
+	music.loadSound("sounds/Lasses_Tippi_music.ogg", false);
 	music.setLoop(true);
 	music.play();
 
